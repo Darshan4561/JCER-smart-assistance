@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCER Smart Assistance</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="bg-overlay"></div>
+    <!-- Background is now handled by CSS on the body element -->
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="images/logo.png.jpeg" id="college-logo" onerror="this.src='images/logo.png.jpeg'">
+                <h1>JCER <span>Assistant</span></h1>
+            </div>
+
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="en">EN</button>
+                <button class="lang-btn" data-lang="hi">HI</button>
+                <button class="lang-btn" data-lang="kn">KN</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Left Side: Dialpad -->
+            <div class="dialpad-container">
+                <div class="dialpad" id="main-dialpad">
+                    <button class="dial-btn" data-topic="1">
+                        <span class="topic-name">About College</span>
+                    </button>
+                    <button class="dial-btn special-btn" data-topic="1_principal">
+                        <span class="topic-name">Principal Sir</span>
+                    </button>
+                    <button class="dial-btn" data-topic="2">
+                        <span class="topic-name">Admission</span>
+                    </button>
+                    <button class="dial-btn" data-topic="3">
+                        <span class="topic-name">CSE</span>
+                    </button>
+                    <button class="dial-btn" data-topic="4">
+                        <span class="topic-name">ECE</span>
+                    </button>
+                    <button class="dial-btn" data-topic="5">
+                        <span class="topic-name">AI & ML</span>
+                    </button>
+                    <button class="dial-btn" data-topic="6">
+                        <span class="topic-name">Mechanical</span>
+                    </button>
+                    <button class="dial-btn" data-topic="7">
+                        <span class="topic-name">Civil</span>
+                    </button>
+                    <button class="dial-btn" data-topic="8">
+                        <span class="topic-name">App Science</span>
+                    </button>
+                    <button class="dial-btn" data-topic="9">
+                        <span class="topic-name">MBA</span>
+                    </button>
+                    <button class="dial-btn" data-topic="12">
+                        <span class="topic-name">Facilities</span>
+                    </button>
+                    <button class="dial-btn action-btn" data-topic="10">
+                        <span class="topic-name">Rules</span>
+                    </button>
+                    <button class="dial-btn action-btn" data-topic="#">
+                        <span class="topic-name">Contact Us</span>
+                    </button>
+                    <button class="dial-btn" data-topic="11">
+                        <span class="topic-name">Canteen</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side: Display Content -->
+            <div class="display-panel">
+                <div id="topic-image-container" class="topic-image-container" style="display: none;">
+                    <img id="topic-image" src="">
+                </div>
+                <div class="display-content">
+                    <h2 id="topic-title">Welcome</h2>
+                    <p id="topic-text">Select a topic from the dialpad below.</p>
+                    <div id="sub-buttons-display" class="sub-buttons-display"></div>
+                </div>
+                <div class="audio-waves" id="audio-waves">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <button id="speaker-btn" class="speaker-btn"><i class="fa-solid fa-volume-high"></i> Stop Speaking</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
