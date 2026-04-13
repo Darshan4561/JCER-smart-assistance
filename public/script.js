@@ -37,7 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 '12': 'Facilities',
                 '10': 'Rules',
                 '#': 'Contact Us',
-                '11': 'Canteen'
+                '11': 'Canteen',
+                '13': 'Placements'
             },
             'sub-btns': {
                 'principal': '<i class="fa-solid fa-user-tie"></i> Meet Principal Sir',
@@ -66,7 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 '12': 'सुविधाएं',
                 '10': 'नियम',
                 '#': 'संपर्क करें',
-                '11': 'कैंटीन'
+                '11': 'कैंटीन',
+                '13': 'प्लेसमेंट'
             },
             'sub-btns': {
                 'principal': '<i class="fa-solid fa-user-tie"></i> प्राचार्य से मिलें',
@@ -95,7 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 '12': 'ಸೌಲಭ್ಯಗಳು',
                 '10': 'ನಿಯಮಗಳು',
                 '#': 'ಸಂಪರ್ಕಿಸಿ',
-                '11': 'ಕ್ಯಾಂಟೀನ್'
+                '11': 'ಕ್ಯಾಂಟೀನ್',
+                '13': 'ಪ್ಲೇಸ್‌ಮೆಂಟ್ಸ್'
             },
             'sub-btns': {
                 'principal': '<i class="fa-solid fa-user-tie"></i> ಪ್ರಾಂಶುಪಾಲರನ್ನು ಭೇಟಿ ಮಾಡಿ',
@@ -267,11 +270,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function typeText(element, text, index, isTitle, seq, callback) {
         if (seq !== currentTypingSequence) return;
-        if (index === 0) element.textContent = "";
-        if (index < text.length) {
-            element.textContent += text.charAt(index);
-            setTimeout(() => typeText(element, text, index + 1, isTitle, seq, callback), isTitle ? 20 : 10);
-        } else if (callback) callback();
+        
+        if (index === 0) {
+            element.textContent = "";
+            // Split text by lines to handle list items differently
+            const lines = text.split('\n');
+            let currentLineIndex = 0;
+            let currentCharIndex = 0;
+
+            function processNext() {
+                if (seq !== currentTypingSequence) return;
+                if (currentLineIndex >= lines.length) {
+                    if (callback) callback();
+                    return;
+                }
+
+                const line = lines[currentLineIndex];
+                const isListItem = line.trim().startsWith('•') || /^\d+\./.test(line.trim());
+
+                if (isListItem && !isTitle) {
+                    // Reveal list item one by one (line by line)
+                    if (currentCharIndex === 0 && currentLineIndex > 0) {
+                        element.textContent += '\n';
+                    }
+                    element.textContent += line;
+                    currentLineIndex++;
+                    currentCharIndex = 0;
+                    setTimeout(processNext, 400); // 400ms delay between list items
+                } else {
+                    // Type character by character
+                    if (currentCharIndex < line.length) {
+                        if (currentCharIndex === 0 && currentLineIndex > 0) {
+                            element.textContent += '\n';
+                        }
+                        element.textContent += line.charAt(currentCharIndex);
+                        currentCharIndex++;
+                        setTimeout(processNext, isTitle ? 15 : 5);
+                    } else {
+                        currentLineIndex++;
+                        currentCharIndex = 0;
+                        setTimeout(processNext, isTitle ? 15 : 5);
+                    }
+                }
+            }
+            processNext();
+        }
     }
 
     function speakText(text, langCode) {
