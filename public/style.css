@@ -309,8 +309,18 @@ main {
 
 footer {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
     margin-top: 10px;
+}
+
+.creator-name {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-align: center;
+    opacity: 0.8;
 }
 
 .speaker-btn {
