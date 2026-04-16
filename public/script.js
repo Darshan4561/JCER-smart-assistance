@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (seq !== currentTypingSequence) return;
         
         if (index === 0) {
-            element.textContent = "";
+            element.innerHTML = "";
             // Split text by lines to handle list items differently
             const lines = text.split('\n');
             let currentLineIndex = 0;
@@ -291,9 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isListItem && !isTitle) {
                     // Reveal list item one by one (line by line)
                     if (currentCharIndex === 0 && currentLineIndex > 0) {
-                        element.textContent += '\n';
+                        element.innerHTML += '\n';
                     }
-                    element.textContent += line;
+                    element.innerHTML += line;
                     currentLineIndex++;
                     currentCharIndex = 0;
                     setTimeout(processNext, 400); // 400ms delay between list items
@@ -301,9 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Type character by character
                     if (currentCharIndex < line.length) {
                         if (currentCharIndex === 0 && currentLineIndex > 0) {
-                            element.textContent += '\n';
+                            element.innerHTML += '\n';
                         }
-                        element.textContent += line.charAt(currentCharIndex);
+                        element.innerHTML += line.charAt(currentCharIndex);
                         currentCharIndex++;
                         setTimeout(processNext, isTitle ? 15 : 5);
                     } else {

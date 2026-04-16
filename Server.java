@@ -13,70 +13,70 @@ import java.util.Map;
 
 public class Server {
 
-    public static void main(String[] args) throws Exception {
-        int port = 8081;
-        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        System.out.println("Starting JCER Smart Assistance server on port " + port);
+        public static void main(String[] args) throws Exception {
+                int port = 8081;
+                HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+                System.out.println("Starting JCER Smart Assistance server on port " + port);
 
-        server.createContext("/", new StaticFileHandler());
-        server.createContext("/api/info", new ApiHandler());
+                server.createContext("/", new StaticFileHandler());
+                server.createContext("/api/info", new ApiHandler());
 
-        server.setExecutor(null); // creates a default executor
-        server.start();
-        System.out.println("Server is running at http://localhost:" + port);
-    }
-
-    static class StaticFileHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            String path = exchange.getRequestURI().getPath();
-            if (path.equals("/")) {
-                path = "/index.html";
-            }
-
-            // Defend against directory traversal
-            if (path.contains("..")) {
-                String response = "403 Forbidden";
-                exchange.sendResponseHeaders(403, response.length());
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(response.getBytes());
-                }
-                return;
-            }
-
-            java.nio.file.Path filePath = Paths.get("public" + path);
-            if (Files.exists(filePath) && !Files.isDirectory(filePath)) {
-                String contentType = "text/plain";
-                if (path.endsWith(".html"))
-                    contentType = "text/html";
-                else if (path.endsWith(".css"))
-                    contentType = "text/css";
-                else if (path.endsWith(".js"))
-                    contentType = "application/javascript";
-                else if (path.endsWith(".jpg") || path.endsWith(".jpeg"))
-                    contentType = "image/jpeg";
-                else if (path.endsWith(".png"))
-                    contentType = "image/png";
-                else if (path.endsWith(".webp"))
-                    contentType = "image/webp";
-
-                exchange.getResponseHeaders().set("Content-Type", contentType);
-                exchange.sendResponseHeaders(200, Files.size(filePath));
-                try (OutputStream os = exchange.getResponseBody()) {
-                    Files.copy(filePath, os);
-                }
-            } else {
-                String response = "404 Not Found";
-                exchange.sendResponseHeaders(404, response.length());
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(response.getBytes());
-                }
-            }
+                server.setExecutor(null); // creates a default executor
+                server.start();
+                System.out.println("Server is running at http://localhost:" + port);
         }
-    }
 
-    static class ApiHandler implements HttpHandler {
-        private final Map<String, Map<String, TopicInfo>> db = new HashMap<>();
+        static class StaticFileHandler implements HttpHandler {
+                @Override
+                public void handle(HttpExchange exchange) throws IOException {
+                        String path = exchange.getRequestURI().getPath();
+                        if (path.equals("/")) {
+                                path = "/index.html";
+                        }
+
+                        // Defend against directory traversal
+                        if (path.contains("..")) {
+                                String response = "403 Forbidden";
+                                exchange.sendResponseHeaders(403, response.length());
+                                try (OutputStream os = exchange.getResponseBody()) {
+                                        os.write(response.getBytes());
+                                }
+                                return;
+                        }
+
+                        java.nio.file.Path filePath = Paths.get("public" + path);
+                        if (Files.exists(filePath) && !Files.isDirectory(filePath)) {
+                                String contentType = "text/plain";
+                                if (path.endsWith(".html"))
+                                        contentType = "text/html";
+                                else if (path.endsWith(".css"))
+                                        contentType = "text/css";
+                                else if (path.endsWith(".js"))
+                                        contentType = "application/javascript";
+                                else if (path.endsWith(".jpg") || path.endsWith(".jpeg"))
+                                        contentType = "image/jpeg";
+                                else if (path.endsWith(".png"))
+                                        contentType = "image/png";
+                                else if (path.endsWith(".webp"))
+                                        contentType = "image/webp";
+
+                                exchange.getResponseHeaders().set("Content-Type", contentType);
+                                exchange.sendResponseHeaders(200, Files.size(filePath));
+                                try (OutputStream os = exchange.getResponseBody()) {
+                                        Files.copy(filePath, os);
+                                }
+                        } else {
+                                String response = "404 Not Found";
+                                exchange.sendResponseHeaders(404, response.length());
+                                try (OutputStream os = exchange.getResponseBody()) {
+                                        os.write(response.getBytes());
+                                }
+                        }
+                }
+        }
+
+        static class ApiHandler implements HttpHandler {
+                private final Map<String, Map<String, TopicInfo>> db = new HashMap<>();
 
         public ApiHandler() {
             // Topic 1: About College
@@ -115,25 +115,45 @@ public class Server {
 
             // Topic 2: Admission
             addTopic("2", "en", "Admission Process",
-                    "Welcome to Jain College of Engineering and Research. We offer Undergraduate and Postgraduate courses in various streams. Admission can be taken through UGCET, DCET, or Management quota. \n\nWe provide courses in:\n• Computer Science & Engineering\n• Electronics & Communication Engineering\n• Artificial Intelligence & Machine Learning\n• Mechanical Engineering\n• Civil Engineering\n• MBA\n\nFor further information, please visit office room number G04 and meet Shivakumar Biradar sir. Thank you.",
+                    "Welcome to Jain College of Engineering and Research. We offer Undergraduate and Postgraduate courses in various streams. Admission can be taken through UGCET, DCET, or Management quota. \n\nWe provide courses in:\n• <u>Computer Science & Engineering</u>\n• <u>Electronics & Communication Engineering</u>\n• <u>Artificial Intelligence & Machine Learning</u>\n• <u>Mechanical Engineering</u>\n• <u>Civil Engineering</u>\n• <u>MBA</u>\n\nFor further information, please visit office room number G04 and meet Shivakumar Biradar sir. Thank you.",
                     null);
             addTopic("2", "hi", "प्रवेश प्रक्रिया",
-                    "जैन कॉलेज ऑफ इंजीनियरिंग एंड रिसर्च में आपका स्वागत है। हम विभिन्न इंजीनियरिंग धाराओं में स्नातक पाठ्यक्रम प्रदान करते हैं। प्रवेश UGCET, DCET या प्रबंधन कोटे के माध्यम से लिया जा सकता है।\n\nहम निम्नलिखित पाठ्यक्रम प्रदान करते हैं:\n• कंप्यूटर साइंस एंड इंजीनियरिंग\n• इलेक्ट्रॉनिक्स एंड कम्युनिकेशन इंजीनियरिंग\n• आर्टिफिशियल इंटेलिजेंस और मशीन लर्निंग\n• मैकेनिकल इंजीनियरिंग\n• सिविल इंजीनियरिंग\n• एमबीए\n\nअधिक जानकारी के लिए, कृपया कार्यालय कक्ष संख्या G04 में जाएँ और शिवकुमार बिरादर सर से मिलें। धन्यवाद।",
+                    "जैन कॉलेज ऑफ इंजीनियरिंग एंड रिसर्च में आपका स्वागत है। हम विभिन्न इंजीनियरिंग धाराओं में स्नातक पाठ्यक्रम प्रदान करते हैं। प्रवेश UGCET, DCET या प्रबंधन कोटे के माध्यम से लिया जा सकता है।\n\nहम निम्नलिखित पाठ्यक्रम प्रदान करते हैं:\n• <u>कंप्यूटर साइंस एंड इंजीनियरिंग</u>\n• <u>इलेक्ट्रॉनिक्स एंड कम्युनिकेशन इंजीनियरिंग</u>\n• <u>आर्टिफिशियल इंटेलिजेंस और मशीन लर्निंग</u>\n• <u>मैकेनिकल इंजीनियरिंग</u>\n• <u>सिविल इंजीनियरिंग</u>\n• <u>एमबीए</u>\n\nअधिक जानकारी के लिए, कृपया कार्यालय कक्ष संख्या G04 में जाएँ और शिवकुमार बिरादर सर से मिलें। धन्यवाद।",
                     null);
             addTopic("2", "kn", "ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ",
-                    "ಜೈನ್ ಕಾಲೇಜ್ ಆಫ್ ಇಂಜಿನಿಯರಿಂಗ್ ಅಂಡ್ ರಿಸರ್ಚ್‌ಗೆ ಸುಸ್ವಾಗತ. ನಾವು ವಿವಿಧ ಇಂಜಿನಿಯರಿಂಗ್ ವಿಭಾಗಗಳಲ್ಲಿ ಪದವಿ ಕೋರ್ಸ್‌ಗಳನ್ನು ನೀಡುತ್ತೇವೆ. UGCET, DCET ಅಥವಾ ಮ್ಯಾನೇಜ್‌ಮೆಂಟ್ ಕೋಟಾದ ಮೂಲಕ ಪ್ರವೇಶ ಪಡೆಯಬಹುದು.\n\nನಾವು ಈ ಕೆಳಗಿನ ಕೋರ್ಸ್‌ಗಳನ್ನು ನೀಡುತ್ತೇವೆ:\n• ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಅಂಡ್ ಇಂಜಿನಿಯರಿಂಗ್\n• ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್ ಅಂಡ್ ಕಮ್ಯುನಿಕೇಷನ್ ಇಂಜಿನಿಯರಿಂಗ್\n• ಆರ್ಟಿಫಿಶಿಯಲ್ ಇಂಟೆಲಿಜೆನ್ಸ್ ಮತ್ತು ಮಷಿನ್ ಲರ್ನಿಂಗ್\n• ಮೆಕ್ಯಾನಿಕಲ್ ಇಂಜಿನಿಯರಿಂಗ್\n• ಸಿವಿಲ್ ಇಂಜಿನಿಯರಿಂಗ್\n• ಎಂಬಿಎ\n\nಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ, ದಯವಿಟ್ಟು ಕಚೇರಿ ಕೊಠಡಿ ಸಂಖ್ಯೆ G04 ಗೆ ಭೇಟಿ ನೀಡಿ ಮತ್ತು ಶಿವಕುಮಾರ್ ಬಿರಾದಾರ್ ಸರ್ ಅವರನ್ನು ಭೇಟಿ ಮಾಡಿ. ಧನ್ಯವಾದಗಳು.",
+                    "ಜೈನ್ ಕಾಲೇಜ್ ಆಫ್ ಇಂಜಿನಿಯರಿಂಗ್ ಅಂಡ್ ರಿಸರ್ಚ್‌ಗೆ ಸುಸ್ವಾಗತ. ನಾವು ವಿವಿಧ ಇಂಜಿನಿಯರಿಂಗ್ ವಿಭಾಗಗಳಲ್ಲಿ ಪದವಿ ಕೋರ್ಸ್‌ಗಳನ್ನು ನೀಡುತ್ತೇವೆ. UGCET, DCET ಅಥವಾ ಮ್ಯಾನೇಜ್‌ಮೆಂಟ್ ಕೋಟಾದ ಮೂಲಕ ಪ್ರವೇಶ ಪಡೆಯಬಹುದು.\n\nನಾವು ಈ ಕೆಳಗಿನ ಕೋರ್ಸ್‌ಗಳನ್ನು ನೀಡುತ್ತೇವೆ:\n• <u><b>ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಅಂಡ್ ಇಂಜಿನಿಯರಿಂಗ್</b></u>\n• <u><b>ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್ ಅಂಡ್ ಕಮ್ಯುನಿಕೇಷನ್ ಇಂಜಿನಿಯರಿಂಗ್</b></u>\n• <u><b>ಆರ್ಟಿಫಿಶಿಯಲ್ ಇಂಟೆಲಿಜೆನ್ಸ್ ಮತ್ತು ಮಷಿನ್ ಲರ್ನಿಂಗ್</b></u>\n• <u><b>ಮೆಕ್ಯಾನಿಕಲ್ ಇಂಜಿನಿಯರಿಂಗ್</b></u>\n• <u><b>ಸಿವಿಲ್ ಇಂಜಿನಿಯರಿಂಗ್</b></u>\n• <u><b>ಎಂಬಿಎ</b></u>\n\nಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ, ದಯವಿಟ್ಟು ಕಚೇರಿ ಕೊಠಡಿ ಸಂಖ್ಯೆ G04 ಗೆ ಭೇಟಿ ನೀಡಿ ಮತ್ತು ಶಿವಕುಮಾರ್ ಬಿರಾದಾರ್ ಸರ್ ಅವರನ್ನು ಭೇಟಿ ಮಾಡಿ. ಧನ್ಯವಾದಗಳು.",
                     null);
 
             addTopic("2_ugcet", "en", "UGCET Admission",
-                    "UGCET (KCET) admission is for students seeking entry into the first year of engineering. Candidates must participate in the KEA counseling process based on their CET rank. JCER generally follows the Karnataka government-mandated fee structure for CET (KCET) students, which is approximately \\u20b990,000 to \\u20b91 Lakh per year (around \\u20b93.6 Lakhs - \\u20b94 Lakhs for 4 years) for tuition, excluding additional college/exam fees. The KCET code for JCER is E269.",
+                    "UGCET (KCET) admission is for students seeking entry into the first year of engineering. Candidates must participate in the KEA counseling process based on their CET rank. JCER generally follows the Karnataka government-mandated fee structure for CET (KCET) students, which is approximately ₹90,000 to ₹1 Lakh per year (around ₹3.6 Lakhs - ₹4 Lakhs for 4 years) for tuition, excluding additional college/exam fees. The KCET code for JCER is E269.",
                     null);
+            addTopic("2_ugcet", "hi", "UGCET प्रवेश",
+                    "UGCET (KCET) प्रवेश उन छात्रों के लिए है जो इंजीनियरिंग के प्रथम वर्ष में प्रवेश लेना चाहते हैं। उम्मीदवारों को अपनी CET रैंक के आधार पर KEA काउंसलिंग प्रक्रिया में भाग लेना होगा। जेसीईआर (JCER) आमतौर पर CET (KCET) छात्रों के लिए कर्नाटक सरकार द्वारा अनिवार्य शुल्क संरचना का पालन करता है, जो शिक्षण शुल्क के लिए लगभग ₹90,000 से ₹1 लाख प्रति वर्ष (4 वर्षों के लिए लगभग ₹3.6 लाख - ₹4 लाख) है, जिसमें अतिरिक्त कॉलेज/परीक्षा शुल्क शामिल नहीं है। जेसीईआर का KCET कोड E269 है।",
+                    null);
+            addTopic("2_ugcet", "kn", "UGCET ಪ್ರವೇಶ",
+                    "UGCET (KCET) ಪ್ರವೇಶವು ಇಂಜಿನಿಯರಿಂಗ್‌ನ ಮೊದಲ ವರ್ಷಕ್ಕೆ ಪ್ರವೇಶ ಪಡೆಯಲು ಇಚ್ಛಿಸುವ ವಿದ್ಯಾರ್ಥಿಗಳಿಗಾಗಿ. ಅಭ್ಯರ್ಥಿಗಳು ತಮ್ಮ CET ರ್‍ಯಾಂಕ್‌ನ ಆಧಾರದ ಮೇಲೆ KEA ಕೌನ್ಸೆಲಿಂಗ್ ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿ ಭಾಗವಹಿಸಬೇಕು. JCER ಸಾಮಾನ್ಯವಾಗಿ CET (KCET) ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಕರ್ನಾಟಕ ಸರ್ಕಾರವು ನಿಗದಿಪಡಿಸಿದ ಶುಲ್ಕ ರಚನೆಯನ್ನು ಅನುಸರಿಸುತ್ತದೆ, ಇದು ಬೋಧನೆಗಾಗಿ (tuition) ವರ್ಷಕ್ಕೆ ಸರಿಸುಮಾರು ₹90,000 ದಿಂದ ₹1 ಲಕ್ಷದವರೆಗೆ ಇರುತ್ತದೆ (4 ವರ್ಷಗಳಿಗೆ ಸುಮಾರು ₹3.6 ಲಕ್ಷದಿಂದ ₹4 ಲಕ್ಷ), ಹೆಚ್ಚುವರಿ ಕಾಲೇಜು/ಪರೀಕ್ಷಾ ಶುಲ್ಕಗಳನ್ನು ಹೊರತುಪಡಿಸಿ. JCER ನ KCET ಕೋಡ್ E269 ಆಗಿದೆ.",
+                    null);
+
             addTopic("2_dcet", "en", "DCET Admission",
-                    "DCET admission is for Diploma students seeking lateral entry into the second year (3rd semester) of engineering. Candidates must clear the Diploma CET and participate in counseling. The total fee for the BE {Lateral} course at JCER is approximately \\u20b93.67 Lakhs to \\u20b96 Lakhs for the entire duration.",
+                    "DCET admission is for Diploma students seeking lateral entry into the second year (3rd semester) of engineering. Candidates must clear the Diploma CET and participate in counseling. The total fee for the BE {Lateral} course at JCER is approximately ₹3.67 Lakhs to ₹6 Lakhs for the entire duration.",
                     null);
+            addTopic("2_dcet", "hi", "DCET प्रवेश",
+                    "DCET प्रवेश उन डिप्लोमा छात्रों के लिए है जो इंजीनियरिंग के द्वितीय वर्ष (तीसरे सेमेस्टर) में लेटरल एंट्री के माध्यम से प्रवेश लेना चाहते हैं। उम्मीदवारों को डिप्लोमा CET उत्तीर्ण करना होगा और काउंसलिंग में भाग लेना होगा। JCER में BE (लेटरल) कोर्स के लिए कुल शुल्क पूरी अवधि के लिए लगभग ₹3.67 लाख से ₹6 लाख तक है।",
+                    null);
+            addTopic("2_dcet", "kn", "DCET ಪ್ರವೇಶ",
+                    "DCET ಪ್ರವೇಶವು ಇಂಜಿನಿಯರಿಂಗ್‌ನ ಎರಡನೇ ವರ್ಷಕ್ಕೆ (3ನೇ ಸೆಮಿಸ್ಟರ್) ಲ್ಯಾಟರಲ್ ಎಂಟ್ರಿ ಮೂಲಕ ಪ್ರವೇಶ ಪಡೆಯಲು ಇಚ್ಛಿಸುವ ಡಿಪ್ಲೊಮಾ ವಿದ್ಯಾರ್ಥಿಗಳಿಗಾಗಿ. ಅಭ್ಯರ್ಥಿಗಳು ಡಿಪ್ಲೊಮಾ CET ಯನ್ನು ತೇರ್ಗಡೆ ಹೊಂದಬೇಕು ಮತ್ತು ಕೌನ್ಸೆಲಿಂಗ್‌ನಲ್ಲಿ ಭಾಗವಹಿಸಬೇಕು. JCER ನಲ್ಲಿ BE (ಲ್ಯಾಟರಲ್) ಕೋರ್ಸ್‌ಗೆ ಒಟ್ಟು ಶುಲ್ಕವು ಸಂಪೂರ್ಣ ಅವಧಿಗೆ ಅಂದಾಜು ₹3.67 ಲಕ್ಷದಿಂದ ₹6 ಲಕ್ಷದವರೆಗೆ ಇರುತ್ತದೆ.",
+                    null);
+
             addTopic("2_management", "en", "Management Admission",
                     "For direct admission under Management Quota, please visit the college office at room G04 and meet Shivakumar Biradar sir. You can also contact us at principal@jcer.in for fee details.",
                     null);
-
+            addTopic("2_management", "hi", "मैनेजमेंट प्रवेश",
+                    "मैनेजमेंट कोटे के तहत सीधे प्रवेश के लिए, कृपया कॉलेज कार्यालय के कमरा G04 में जाएं और शिवकुमार बिरादर सर से मिलें। आप शुल्क विवरण के लिए हमसे principal@jcer.in पर संपर्क भी कर सकते हैं।",
+                    null);
+            addTopic("2_management", "kn", "ಮ್ಯಾನೇಜ್‌ಮೆಂಟ್ ಪ್ರವೇಶ",
+                    "ಮ್ಯಾನೇಜ್‌ಮೆಂಟ್ ಕೋಟಾದ ಅಡಿಯಲ್ಲಿ ನೇರ ಪ್ರವೇಶಕ್ಕಾಗಿ, ದಯವಿಟ್ಟು ಕಾಲೇಜು ಕಚೇರಿಯ ಕೊಠಡಿ G04 ಗೆ ಭೇಟಿ ನೀಡಿ ಮತ್ತು ಶಿವಕುಮಾರ್ ಬಿರಾದಾರ್ ಸರ್ ಅವರನ್ನು ಭೇಟಿ ಮಾಡಿ. ಶುಲ್ಕದ ವಿವರಗಳಿಗಾಗಿ ನೀವು ನಮ್ಮನ್ನು principal@jcer.in ನಲ್ಲಿ ಸಂಪರ್ಕಿಸಬಹುದು.",
+                    null);
+                    
             addTopic("2_faculty", "en", "Admission Team",
                     "For admission related queries, please contact our dedicated admission cell led by Shivakumar Biradar sir.",
                     "images/faculty_admission.jpg");
@@ -144,7 +164,7 @@ public class Server {
                     "ಪ್ರವೇಶಕ್ಕೆ ಸಂಬಂಧಿಸಿದ ವಿಚಾರಣೆಗಾಗಿ, ದಯವಿಟ್ಟು ಶಿವಕುಮಾರ್ ಬಿರಾದಾರ್ ಸರ್ ನೇತೃತ್ವದ ನಮ್ಮ ಪ್ರವೇಶ ತಂಡವನ್ನು ಸಂಪರ್ಕಿಸಿ.",
                     "images/faculty_admission.jpg");
 
-            // Topic 3: CSE Department
+            // Topic 3: CSE
             addTopic("3", "en", "Computer Science & Engineering",
                     "The Department of Computer Science & Engineering was established in 2018 with an intake of 120, and a dedicated Research Center was established in 2024. We are committed to continuously improving the quality of education with highly qualified staff and centralized laboratories featuring the latest software tools. Our four-year undergraduate program provides a solid foundation in CSE principles and emerging technologies, equipping students to solve complex problems and succeed in the IT industry.",
                     "images/cse_dept.jpg.jpeg");
@@ -198,8 +218,7 @@ public class Server {
                     "17. प्रो. ऋतिका टी कांबले (असिस्टेंट प्रोफेसर)\n" +
                     "18. प्रो. ऋतिका मनगांवकर (असिस्टेंट प्रोफेसर)\n" +
                     "19. प्रो. स्वरूपा ढमुने (असिस्टेंट प्रोफेसर)\n" +
-                    "20. प्रो. कुसुम के कनबरकर (असिस्टेंट प्रोफेसर)", "images/cse_dept.jpg.jpeg",
-                    "संकाय सदस्यों में: डॉ. प्रीतम धुमाले, डॉ. ज्योति बी आर, डॉ. प्रज्ञा मालगांवे, डॉ. राघवेंद्र कटगाल, प्रो. वीणा बी. मिंडोली, प्रो. भरतीश एन. फडनीस, प्रो. विजयलक्ष्मी एस नागनूर, प्रो. आरती पाटिल, प्रो. प्रियंका देसुरकर, प्रो. मेघा वी. पाटिल, प्रो. अभिलाषा जे, प्रो. विनया सरमलकर, प्रो. सुखदा इनामदार, प्रो. सूरज आर जोशी, प्रो. मनोरमा एच पाटिल, प्रो. काव्या हुल्लूर, प्रो. ऋतिका टी कांबले, प्रो. ऋतिका मनगांवकर, प्रो. स्वरूपा ढमुने, और प्रो. कुसुम के कनबरकर शामिल हैं।");
+                    "20. प्रो. कुसुम के कनबरकर (असिस्टेंट प्रोफेसर)", "images/cse_dept.jpg.jpeg");
             addTopic("3_faculty", "kn", "ಸಿಎಸ್ಇ ಬೋಧಕ ವರ್ಗ", "ಸಿಎಸ್‌ಇ ವಿಭಾಗದ ತಜ್ಞ ಸದಸ್ಯರು:\n\n" +
                     "1. ಡಾ. ಪ್ರೀತಮ್ ಧುಮಾಳೆ (ಎಚ್‌ಒಡಿ, ಪ್ರೊಫೆಸರ್)\n" +
                     "2. ಡಾ. ಜ್ಯೋತಿ ಬಿ ಆರ್ (ಅಸೋಸಿಯೇಟ್ ಪ್ರೊಫೆಸರ್ ಮತ್ತು ಡೀನ್ NAAC)\n" +
@@ -223,7 +242,7 @@ public class Server {
                     "20. ಪ್ರೊ. ಕುಸುಮ್ ಕೆ ಕಣಬರಕರ್ (ಅಸಿಸ್ಟೆಂಟ್ ಪ್ರೊಫೆಸರ್)", "images/cse_dept.jpg.jpeg",
                     "ಬೋಧಕ ವರ್ಗವು ಡಾ. ಪ್ರೀತಮ್ ಧುಮಾಳೆ, ಡಾ. ಜ್ಯೋತಿ ಬಿ ಆರ್, ಡಾ. ಪ್ರಜ್ಞಾ ಮಲಗಾನ್ವೆ, ಡಾ. ರಾಘವೇಂದ್ರ ಕಟಗಾಲ್, ಪ್ರೊ. ವೀಣಾ ಬಿ. ಮಿಂದೋಳಿ, ಪ್ರೊ. ಭರತೀಶ್ ಎನ್. ಫಡ್ನಿಸ್, ಪ್ರೊ. ವಿಜಯಲಕ್ಷ್ಮಿ ಎಸ್ ನಾಗನೂರು, ಪ್ರೊ. ಆರತಿ ಪಾಟೀಲ್, ಪ್ರೊ. ಪ್ರಿಯಾಂಕಾ ದೇಸೂರ್ಕರ್, ಪ್ರೊ. ಮೇಘಾ ವಿ. ಪಾಟೀಲ್, ಪ್ರೊ. ಅಭಿಲಾಷಾ ಜೆ, ಪ್ರೊ. ವಿನಯಾ ಸರ್ಮಲ್ಕರ್, ಪ್ರೊ. ಸುಖದಾ ಇನಾಂದಾರ್, ಪ್ರೊ. ಸೂರಜ್ ಆರ್ ಜೋಶಿ, ಪ್ರೊ. ಮನೋರಮಾ ಹೆಚ್ ಪಾಟೀಲ್, ಪ್ರೊ. ಕಾವ್ಯ ಹುಲ್ಲೂರ್, ಪ್ರೊ. ರುತಿಕಾ ಟಿ ಕಾಂಬಳೆ, ಪ್ರೊ. ರುತಿಕಾ ಮನಗಾಂವಕರ್, ಪ್ರೊ. ಸ್ವರೂಪಾ ಧಮುನೆ, ಮತ್ತು ಪ್ರೊ. ಕುಸುಮ್ ಕೆ ಕಣಬರಕರ್ ಅವರನ್ನು ಒಳಗೊಂಡಿದೆ.");
 
-            // Topic 4: ECE Department
+            // Topic 4: ECE
             addTopic("4", "en", "Electronics & Communication",
                     "The Department of Electronics & Communication Engineering was established in 2018 with an intake of 60, which increased to 90 in 2023. A dedicated Research Center was established in 2024. The department is committed to imparting quality education and fostering innovation in electronics and communication technologies, preparing students for dynamic careers in academia, industry, and research.",
                     "images/ece_dpt.jpg.jpeg");
@@ -282,7 +301,7 @@ public class Server {
                     "13. ಪ್ರೊ. ಜಯಶ್ರೀ ಮೋರೆ\n" +
                     "14. ಪ್ರೊ. ಸ್ನೇಹಾ ಎ. ಜಗಜಂಪಿ", "images/ece_dpt.jpg.jpeg");
 
-            // Topic 5: AIML Department
+            // Topic 5: AI & ML
             addTopic("5", "en", "Artificial Intelligence & ML",
                     "The Department of Computer Science & Engineering (Artificial Intelligence and Machine Learning) was established in 2023 with an intake of 60. It is a dynamic and growing hub of innovation at JCER, Belagavi. Despite being new, our department has quickly established itself as a center for learning, offering a cutting-edge curriculum tailored to the ever-evolving fields of AI and ML. Our students are currently in their 7th semester, actively engaging with the latest technologies and hands-on projects.",
                     "images/AIML_dept.jpg.jpeg");
@@ -326,6 +345,7 @@ public class Server {
                     "8. ಪ್ರೊ. ವರ್ಷಾ ಹಿರೇಮಠ್\n" +
                     "9. ಪ್ರೊ. ಮಮತಾ ಹರೋಗೇರಿ", "images/AIML_dept.jpg.jpeg");
 
+            // Topic 6: Mechanical
             addTopic("6", "en", "Mechanical Engineering",
                     "The Department of Mechanical Engineering was established in 2018 with an intake of 60, and a dedicated Research Center was added in 2024. To facilitate students, the department offers well-equipped laboratories and modern infrastructure. Our highly qualified faculty are dedicated to taking extra initiatives to mold students, preparing them to face the challenges of the competitive world.",
                     "images/mechanical_dpt.jpg.jpeg");
@@ -363,9 +383,7 @@ public class Server {
                     "9. प्रो. प्रसन्न मनगांवकर\n" +
                     "10. प्रो. गणेश आर. सी\n" +
                     "11. प्रो. संतोष ए\n" +
-                    "12. प्रो. सचिन कल्लन्नवर",
-                    "images/mechanical_dpt.jpg.jpeg",
-                    "संकाय सदस्यों में: डॉ. एस.वी. गोरबल, डॉ. के. बी. जगदीशगौड़ा, डॉ. गंगाधर एम कनागिनाहल, डॉ. मल्लिकार्जुन जलगरी, डॉ. सदाशिव बेलुब्बी, प्रो. कार्तिक आर, प्रो. राजशेखर पी बिरादर, प्रो. प्रवीण पाटिल, प्रो. प्रसन्न मनगांवकर, प्रो. गणेश आर. सी, प्रो. संतोष ए, और प्रो. सचिन कल्लन्नवर शामिल हैं।");
+                    "12. प्रो. सचिन कल्लन्नवर", "images/mechanical_dpt.jpg.jpeg");
             addTopic("6_faculty", "kn", "ಮೆಕ್ಯಾನಿಕಲ್ ಬೋಧಕ ವರ್ಗ", "ಮೆಕ್ಯಾನಿಕಲ್ ವಿಭಾಗದ ಸದಸ್ಯರು:\n\n" +
                     "1. ಡಾ. ಎಸ್.ವಿ. ಗೊರಬಾಳ್ (ಪ್ರಾಂಶುಪಾಲರು)\n" +
                     "2. ಡಾ. ಕೆ. ಬಿ. ಜಗದೀಶಗೌಡ (ಎಚ್‌ಒಡಿ)\n" +
@@ -378,11 +396,9 @@ public class Server {
                     "9. ಪ್ರೊ. ಪ್ರಸನ್ನ ಮನಗಾಂವಕರ್\n" +
                     "10. ಪ್ರೊ. ಗಣೇಶ್ ಆರ್. ಸಿ\n" +
                     "11. ಪ್ರೊ. ಸಂತೋಷ್ ಎ\n" +
-                    "12. ಪ್ರೊ. ಸಚಿನ್ ಕಲ್ಲಣ್ಣವರ್",
-                    "images/mechanical_dpt.jpg.jpeg",
-                    "ಬೋಧಕ ವರ್ಗವು ಡಾ. ಎಸ್.ವಿ. ಗೊರಬಾಳ್, ಡಾ. ಕೆ. ಬಿ. ಜಗದೀಶಗೌಡ, ಡಾ. ಗಂಗಾಧರ್ ಎಂ ಕಣಗಿನಹಾಳ, ಡಾ. ಮಲ್ಲಿಕಾರ್ಜುನ್ ಜಲಗೇರಿ, ಡಾ. ಸದಾಶಿವ ಬೆಳ್ಳುಬ್ಬಿ, ಪ್ರೊ. ಕಾರ್ತಿಕ್ ಆರ್, ಪ್ರೊ. ರಾಜಶೇಖರ್ ಪಿ ಬಿರಾದಾರ್, ಪ್ರೊ. ಪ್ರವೀಣ್ ಪಾಟೀಲ್, ಪ್ರೊ. ಪ್ರಸನ್ನ ಮನಗಾಂವಕರ್, ಪ್ರೊ. ಗಣೇಶ್ ಆರ್. ಸಿ, ಪ್ರೊ. ಸಂತೋಷ್ ಎ, ಮತ್ತು ಪ್ರೊ. ಸಚಿನ್ ಕಲ್ಲಣ್ಣವರ್ ಅವರನ್ನು ಒಳಗೊಂಡಿದೆ.");
+                    "12. ಪ್ರೊ. ಸಚಿನ್ ಕಲ್ಲಣ್ಣವರ್", "images/mechanical_dpt.jpg.jpeg");
 
-            // Topic 7: Civil Engineering
+            // Topic 7: Civil
             addTopic("7", "en", "Civil Engineering",
                     "The Department of Civil Engineering was established in 2018 with an intake of 30. As a professional discipline, it deals with the design, construction, and maintenance of the physical and naturally built environment, including roads, bridges, canals, dams, and airports. Being the second-oldest engineering discipline, it plays a vital role in both the public and private sectors, serving everyone from individual homeowners to international companies.",
                     "images/civil_dept.jpg.jpeg");
@@ -571,13 +587,14 @@ public class Server {
 
             // Topic 13: Placements
             addTopic("13", "en", "Placements",
-                    "JCER offers a dedicated Placement Cell that provides robust training and placement opportunities for all our students. We have consistently achieved excellent placement records with top multinational companies. Based on 2025 placement reports, the Jain Deemed-to-be University (Faculty of Engineering and Technology) in Bangalore offers an average package of around \u20b98 LPA for its BTech programs, with top performers achieving significantly higher. Computer Science and Engineering (CSE) students generally secure high packages, often within the top salary brackets.\n\nKey Placement Highlights (2025/Recent):\n• Average Package: Approx. \u20b98 LPA.\n• Highest Package: Reached up to \u20b981.25 LPA in 2025.\n• Top Recruiters: Companies like Samsung, Silicon Labs, TCS, and Siemens visited the campus.\n• Placement Data: Over 3,000 companies participated in the 2025 campus recruitment, with over 2,500 offers made.",
-                    null);
+                    "JCER offers a dedicated Placement Cell that provides robust training and placement opportunities for all our students. We have consistently achieved excellent placement records with top multinational companies. Based on 2025 placement reports, the Jain Deemed-to-be University (Faculty of Engineering and Technology) in Bangalore offers an average package of around 8 Lakhs per year for its BTech programs, with top performers achieving significantly higher. Computer Science and Engineering (CSE) students generally secure high packages, often within the top salary brackets.\n\nKey Placement Highlights (2025/Recent):\n• Average Package: Approx. 8 Lakhs per year.\n• Highest Package: Reached up to 81.25 Lakhs per year in 2025.\n• Top Recruiters: Companies like Samsung, Silicon Labs, TCS, and Siemens visited the campus.\n• Placement Data: Over 3,000 companies participated in the 2025 campus recruitment, with over 2,500 offers made.",
+                    null,
+                    "JCER offers a dedicated Placement Cell that provides robust training and placement opportunities for all our students. We have consistently achieved excellent placement records with top multinational companies. Based on 2025 placement reports, the Jain Deemed-to-be University (Faculty of Engineering and Technology) in Bangalore offers an average package of around 8 Lakhs per year for its BTech programs, with top performers achieving significantly higher. Computer Science and Engineering (CSE) students generally secure high packages, often within the top salary brackets. Key Placement Highlights (2025/Recent): Average Package: Approx. 8 Lakhs per year. Highest Package: Reached up to 81.25 Lakhs per year in 2025. Top Recruiters: Companies like Samsung, Silicon Labs, TCS, and Siemens visited the campus. Placement Data: Over 3,000 companies participated in the 2025 campus recruitment, with over 2,500 offers made.");
             addTopic("13", "hi", "प्लेसमेंट",
-                    "जेसीईआर एक समर्पित प्लेसमेंट सेल प्रदान करता है जो हमारे सभी छात्रों के लिए मजबूत प्रशिक्षण और प्लेसमेंट के अवसर प्रदान करता है। हमने शीर्ष बहुराष्ट्रीय कंपनियों के साथ लगातार उत्कृष्ट प्लेसमेंट रिकॉर्ड हासिल किए हैं। 2025 की प्लेसमेंट रिपोर्ट के आधार पर, बैंगलोर में जैन डीम्드-टू-बी यूनिवर्सिटी (फैकल्टी ऑफ इंजीनियरिंग एंड टेक्नोलॉजी) अपने बीटेक कार्यक्रमों के लिए लगभग \u20b98 LPA का औसत पैकेज प्रदान करती है, जिसमें शीर्ष प्रदर्शन करने वाले छात्र काफी अधिक पैकेज प्राप्त करते हैं। कंप्यूटर विज्ञान और इंजीनियरिंग (सीएसई) के छात्र आमतौर पर उच्च पैकेज सुरक्षित करते हैं।\n\nप्रमुख प्लेसमेंट मुख्य अंश (2025/नवीनतम):\n• औसत पैकेज: लगभग \u20b98 LPA।\n• उच्चतम पैकेज: 2025 में \u20b981.25 LPA तक पहुंचा।\n• शीर्ष रिक्रूटर्स: सैमसंग, सिलिकॉन लैब्स, टीसीएस और सीमेंस जैसी कंपनियों ने कैंपस का दौरा किया।\n• प्लेसमेंट डेटा: 2025 कैंपस भर्ती में 3,000 से अधिक कंपनियों ने भाग लिया, जिसमें 2,500 से अधिक प्रस्ताव दिए गए।",
+                    "जेसीईआर एक समर्पित प्लेसमेंट सेल प्रदान करता है जो हमारे सभी छात्रों के लिए मजबूत प्रशिक्षण और प्लेसमेंट के अवसर प्रदान करता है। हमने शीर्ष बहुराष्ट्रीय कंपनियों के साथ लगातार उत्कृष्ट प्लेसमेंट रिकॉर्ड हासिल किए हैं। 2025 की प्लेसमेंट रिपोर्ट के आधार पर, बैंगलोर में जैन डीम्ड-टू-बी यूनिवर्सिटी (फैकल्टी ऑफ इंजीनियरिंग एंड टेक्नोलॉजी) अपने बीटेक कार्यक्रमों के लिए लगभग 8 लाख प्रति वर्ष का औसत पैकेज प्रदान करती है, जिसमें शीर्ष प्रदर्शन करने वाले छात्र काफी अधिक पैकेज प्राप्त करते हैं। कंप्यूटर विज्ञान और इंजीनियरिंग (सीएसई) के छात्र आमतौर पर उच्च पैकेज सुरक्षित करते हैं।\n\nप्रमुख प्लेसमेंट मुख्य अंश (2025/नवीनतम):\n• औसत पैकेज: लगभग 8 लाख प्रति वर्ष।\n• उच्चतम पैकेज: 2025 में 81.25 लाख प्रति वर्ष तक पहुंचा।\n• शीर्ष रिक्रूटर्स: सैमसंग, सिलिकॉन लैब्स, टीसीएस और सीमेंस जैसी कंपनियों ने कैंपस का दौरा किया।\n• प्लेसमेंट डेटा: 2025 कैंपस भर्ती में 3,000 से अधिक कंपनियों ने भाग लिया, जिसमें 2,500 से अधिक प्रस्ताव दिए गए।",
                     null);
             addTopic("13", "kn", "ಪ್ಲೇಸ್‌ಮೆಂಟ್ಸ್",
-                    "ನಮ್ಮ ಎಲ್ಲಾ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಉತ್ತಮ ತರಬೇತಿ ಮತ್ತು ಉದ್ಯೋಗಾವಕಾಶಗಳನ್ನು ಒದಗಿಸುವ ಮೀಸಲಾದ ಪ್ಲೇಸ್‌ಮೆಂಟ್ ಸೆಲ್ ಅನ್ನು ಜೆಸಿಇಆರ್ ಹೊಂದಿದೆ. ನಾವು ಉನ್ನತ ಬಹುರಾಷ್ಟ್ರೀಯ ಕಂಪನಿಗಳೊಂದಿಗೆ ಅತ್ಯುತ್ತಮ ಉದ್ಯೋಗ ದಾಖಲೆಗಳನ್ನು ಸಾಧಿಸಿದ್ದೇವೆ. 2025 ರ ಪ್ಲೇಸ್‌ಮೆಂಟ್ ವರದಿಗಳ ಆಧಾರದ ಮೇಲೆ, ಬೆಂಗಳೂರಿನ ಜೈನ್ ಡೀಮ್ಡ್-ಟು-ಬಿ ವಿಶ್ವವಿದ್ಯಾಲಯ (ಎಂಜಿನಿಯರಿಂಗ್ ಮತ್ತು ತಂತ್ರಜ್ಞಾನ ವಿಭಾಗ) ತನ್ನ ಬಿಟೆಕ್ ಕಾರ್ಯಕ್ರಮಗಳಿಗೆ ಸರಿಸುಮಾರು \u20b98 LPA ಸರಾಸರಿ ಪ್ಯಾಕೇಜ್ ನೀಡುತ್ತದೆ, ಉನ್ನತ ಸಾಧಕರು ಗಣನೀಯವಾಗಿ ಹೆಚ್ಚಿನ ಪ್ಯಾಕೇಜ್ ಪಡೆಯುತ್ತಾರೆ. ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಮತ್ತು ಎಂಜಿನಿಯರಿಂಗ್ (ಸಿಎಸ್‌ಇ) ವಿದ್ಯಾರ್ಥಿಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಹೆಚ್ಚಿನ ಪ್ಯಾಕೇಜ್‌ಗಳನ್ನು ಪಡೆಯುತ್ತಾರೆ.\n\nಪ್ರಮುಖ ಪ್ಲೇಸ್‌ಮೆಂಟ್ ಮುಖ್ಯಾಂಶಗಳು (2025/ಇತ್ತೀಚಿನ):\n• ಸರಾಸರಿ ಪ್ಯಾಕೇಜ್: ಅಂದಾಜು \u20b98 LPA.\n• ಅತಿ ಹೆಚ್ಚು ಪ್ಯಾಕೇಜ್: 2025 ರಲ್ಲಿ \u20b981.25 LPA ತಲುಪಿದೆ.\n• ಉನ್ನತ ನೇಮಕಾತಿದಾರರು: ಸ್ಯಾಮ್ಸಂಗ್, ಸಿಲಿಕಾನ್ ಲ್ಯಾಬ್ಸ್, ಟಿಸಿಎಸ್, ಮತ್ತು ಸೀಮೆನ್ಸ್ ನಂತಹ ಕಂಪನಿಗಳು ಕ್ಯಾಂಪಸ್‌ಗೆ ಭೇಟಿ ನೀಡಿದ್ದವು.\n• ಪ್ಲೇಸ್‌ಮೆಂಟ್ ಡೇಟಾ: 2025 ರ ಕ್ಯಾಂಪಸ್ ನೇಮಕಾತಿಯಲ್ಲಿ 3,000 ಕ್ಕೂ ಹೆಚ್ಚು ಕಂಪನಿಗಳು ಭಾಗವಹಿಸಿದ್ದು, 2,500 ಕ್ಕೂ ಹೆಚ್ಚು ಆಫರ್‌ಗಳನ್ನು ನೀಡಲಾಗಿದೆ.",
+                    "ನಮ್ಮ ಎಲ್ಲಾ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಉತ್ತಮ ತರಬೇತಿ ಮತ್ತು ಉದ್ಯೋಗಾವಕಾಶಗಳನ್ನು ಒದಗಿಸುವ ಮೀಸಲಾದ ಪ್ಲೇಸ್‌ಮೆಂಟ್ ಸೆಲ್ ಅನ್ನು ಜೆಸಿಇಆರ್ ಹೊಂದಿದೆ. ನಾವು ಉನ್ನತ ಬಹುರಾಷ್ಟ್ರೀಯ ಕಂಪನಿಗಳೊಂದಿಗೆ ಅತ್ಯುತ್ತಮ ಉದ್ಯೋಗ ದಾಖಲೆಗಳನ್ನು ಸಾಧಿಸಿದ್ದೇವೆ. 2025 ರ ಪ್ಲೇಸ್‌ಮೆಂಟ್ ವರದಿಗಳ ಆಧಾರದ ಮೇಲೆ, ಬೆಂಗಳೂರಿನ ಜೈನ್ ಡೀಮ್ಡ್-ಟು-ಬಿ ವಿಶ್ವವಿದ್ಯಾಲಯ (ಎಂಜಿನಿಯರಿಂಗ್ ಮತ್ತು ತಂತ್ರಜ್ಞಾನ ವಿಭಾಗ) ತನ್ನ ಬಿಟೆಕ್ ಕಾರ್ಯಕ್ರಮಗಳಿಗೆ ಸರಿಸುಮಾರು 8 ಲಕ್ಷ ಪ್ರತಿ ವರ್ಷ ಸರಾಸರಿ ಪ್ಯಾಕೇಜ್ ನೀಡುತ್ತದೆ, ಉನ್ನತ ಸಾಧಕರು ಗಣನೀಯವಾಗಿ ಹೆಚ್ಚಿನ ಪ್ಯಾಕೇಜ್ ಪಡೆಯುತ್ತಾರೆ. ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಮತ್ತು ಎಂಜಿನಿಯರಿಂಗ್ (ಸಿಎಸ್‌ಇ) ವಿದ್ಯಾರ್ಥಿಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಹೆಚ್ಚಿನ ಪ್ಯಾಕೇಜ್‌ಗಳನ್ನು ಪಡೆಯುತ್ತಾರೆ.\n\nಪ್ರಮುಖ ಪ್ಲೇಸ್‌ಮೆಂಟ್ ಮುಖ್ಯಾಂಶಗಳು (2025/ಇತ್ತೀಚಿನ):\n• ಸರಾಸರಿ ಪ್ಯಾಕೇಜ್: ಅಂದಾಜು 8 ಲಕ್ಷ ಪ್ರತಿ ವರ್ಷ.\n• ಅತಿ ಹೆಚ್ಚು ಪ್ಯಾಕೇಜ್: 2025 ರಲ್ಲಿ 81.25 ಲಕ್ಷ ಪ್ರತಿ ವರ್ಷ ತಲುಪಿದೆ.\n• ಉನ್ನತ ನೇಮಕಾತಿದಾರರು: ಸ್ಯಾಮ್ಸಂಗ್, ಸಿಲಿಕಾನ್ ಲ್ಯಾಬ್ಸ್, ಟಿಸಿಎಸ್, ಮತ್ತು ಸೀಮೆನ್ಸ್ ನಂತಹ ಕಂಪನಿಗಳು ಕ್ಯಾಂಪಸ್‌ಗೆ ಭೇಟಿ ನೀಡಿದ್ದವು.\n• ಪ್ಲೇಸ್‌ಮೆಂಟ್ ಡೇಟಾ: 2025 ರ ಕ್ಯಾಂಪಸ್ ನೇಮಕಾತಿಯಲ್ಲಿ 3,000 ಕ್ಕೂ ಹೆಚ್ಚು ಕಂಪನಿಗಳು ಭಾಗವಹಿಸಿದ್ದು, 2,500 ಕ್ಕೂ ಹೆಚ್ಚು ಆಫರ್‌ಗಳನ್ನು ನೀಡಲಾಗಿದೆ.",
                     null);
 
             // Topic #: Contact
@@ -591,81 +608,87 @@ public class Server {
                     "images/contact.jpg.jpeg");
         }
 
-        private void addTopic(String id, String lang, String title, String text, String imageUrl) {
-            addTopic(id, lang, title, text, imageUrl, null);
-        }
+                private void addTopic(String id, String lang, String title, String text, String imageUrl) {
+                        addTopic(id, lang, title, text, imageUrl, null);
+                }
 
-        private void addTopic(String id, String lang, String title, String text, String imageUrl, String spokenText) {
-            db.computeIfAbsent(id, k -> new HashMap<>()).put(lang, new TopicInfo(title, text, imageUrl, spokenText));
-        }
+                private void addTopic(String id, String lang, String title, String text, String imageUrl,
+                                String spokenText) {
+                        db.computeIfAbsent(id, k -> new HashMap<>()).put(lang,
+                                        new TopicInfo(title, text, imageUrl, spokenText));
+                }
 
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-            exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+                @Override
+                public void handle(HttpExchange exchange) throws IOException {
+                        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+                        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
 
-            String query = exchange.getRequestURI().getQuery();
-            String topic = "1";
-            String lang = "en";
+                        String query = exchange.getRequestURI().getQuery();
+                        String topic = "1";
+                        String lang = "en";
 
-            if (query != null) {
-                String[] params = query.split("&");
-                for (String param : params) {
-                    String[] pair = param.split("=");
-                    if (pair.length > 1) {
-                        try {
-                            if (pair[0].equals("topic"))
-                                topic = URLDecoder.decode(pair[1], StandardCharsets.UTF_8.name());
-                            if (pair[0].equals("lang"))
-                                lang = URLDecoder.decode(pair[1], StandardCharsets.UTF_8.name());
-                        } catch (UnsupportedOperationException e) {
+                        if (query != null) {
+                                String[] params = query.split("&");
+                                for (String param : params) {
+                                        String[] pair = param.split("=");
+                                        if (pair.length > 1) {
+                                                try {
+                                                        if (pair[0].equals("topic"))
+                                                                topic = URLDecoder.decode(pair[1],
+                                                                                StandardCharsets.UTF_8.name());
+                                                        if (pair[0].equals("lang"))
+                                                                lang = URLDecoder.decode(pair[1],
+                                                                                StandardCharsets.UTF_8.name());
+                                                } catch (UnsupportedOperationException e) {
+                                                }
+                                        }
+                                }
                         }
-                    }
+
+                        System.out.println("Request: topic=" + topic + ", lang=" + lang);
+
+                        Map<String, TopicInfo> topicMap = db.get(topic);
+                        if (topicMap != null) {
+                                TopicInfo info = topicMap.getOrDefault(lang, topicMap.get("en"));
+                                String imageUrlJson = info.imageUrl != null
+                                                ? String.format(", \"imageUrl\": \"%s\"", info.imageUrl)
+                                                : "";
+                                String spokenTextJson = info.spokenText != null
+                                                ? String.format(", \"spokenText\": \"%s\"", escapeJson(info.spokenText))
+                                                : "";
+                                String jsonResponse = String.format("{\"title\": \"%s\", \"text\": \"%s\"%s%s}",
+                                                escapeJson(info.title),
+                                                escapeJson(info.text), imageUrlJson, spokenTextJson);
+                                byte[] bytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
+                                exchange.sendResponseHeaders(200, bytes.length);
+                                try (OutputStream os = exchange.getResponseBody()) {
+                                        os.write(bytes);
+                                }
+                        } else {
+                                String error = "{\"error\": \"Topic not found\"}";
+                                exchange.sendResponseHeaders(404, error.length());
+                                try (OutputStream os = exchange.getResponseBody()) {
+                                        os.write(error.getBytes());
+                                }
+                        }
                 }
-            }
 
-            System.out.println("Request: topic=" + topic + ", lang=" + lang);
-
-            Map<String, TopicInfo> topicMap = db.get(topic);
-            if (topicMap != null) {
-                TopicInfo info = topicMap.getOrDefault(lang, topicMap.get("en"));
-                String imageUrlJson = info.imageUrl != null ? String.format(", \"imageUrl\": \"%s\"", info.imageUrl)
-                        : "";
-                String spokenTextJson = info.spokenText != null
-                        ? String.format(", \"spokenText\": \"%s\"", escapeJson(info.spokenText))
-                        : "";
-                String jsonResponse = String.format("{\"title\": \"%s\", \"text\": \"%s\"%s%s}", escapeJson(info.title),
-                        escapeJson(info.text), imageUrlJson, spokenTextJson);
-                byte[] bytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
-                exchange.sendResponseHeaders(200, bytes.length);
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(bytes);
+                private String escapeJson(String input) {
+                        return input.replace("\"", "\\\"").replace("\r", "\\r").replace("\n", "\\n");
                 }
-            } else {
-                String error = "{\"error\": \"Topic not found\"}";
-                exchange.sendResponseHeaders(404, error.length());
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(error.getBytes());
+
+                private static class TopicInfo {
+                        String title;
+                        String text;
+                        String imageUrl;
+                        String spokenText;
+
+                        TopicInfo(String title, String text, String imageUrl, String spokenText) {
+                                this.title = title;
+                                this.text = text;
+                                this.imageUrl = imageUrl;
+                                this.spokenText = spokenText;
+                        }
                 }
-            }
         }
-
-        private String escapeJson(String input) {
-            return input.replace("\"", "\\\"").replace("\r", "\\r").replace("\n", "\\n");
-        }
-
-        private static class TopicInfo {
-            String title;
-            String text;
-            String imageUrl;
-            String spokenText;
-
-            TopicInfo(String title, String text, String imageUrl, String spokenText) {
-                this.title = title;
-                this.text = text;
-                this.imageUrl = imageUrl;
-                this.spokenText = spokenText;
-            }
-        }
-    }
 }
